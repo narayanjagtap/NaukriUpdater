@@ -3,9 +3,9 @@ name: Naukri Daily Update
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch:      # Enables the manual "Run" button
+  workflow_dispatch:        # Enables the manual "Run" button
   schedule:
-    - cron: '30 3 * * *'  # Runs daily at 9:00 AM IST (03:30 UTC)
+    - cron: '30 3 * * *'    # Runs daily at 9:00 AM IST (03:30 UTC)
 
 jobs:
   build:
@@ -24,11 +24,13 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1.2.0
+
       - name: Run Naukri Updater
-        env:
+        env:  # <--- THIS WAS MISSING. It connects your Secrets to the script.
           NAUKRI_USERNAME: ${{ secrets.NAUKRI_USERNAME }}
           NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
         run: |
-          # Only run the actual script, not the test suite if possible.
-          # If your script is inside test.py, this line is fine:
+          # Runs the test suite which triggers the profile update
           python -m unittest test || python3 -m unittest test.py
